@@ -1,11 +1,12 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
 namespace PCapReader
 {
-    public class PCapFile : IDisposable
+    public class PCapFile : IDisposable, IEnumerable<PCapPacket>
     {
         bool isDisposed = false;
         public ushort VersionMajor { get; private set; }
@@ -110,6 +111,18 @@ namespace PCapReader
                 return;
             isDisposed = true;
             stream?.Dispose();
+        }
+
+        public IEnumerator<PCapPacket> GetEnumerator()
+        {
+            while (this.HasPacket)
+                yield return Next();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            while (this.HasPacket)
+                yield return Next();
         }
     }
 }

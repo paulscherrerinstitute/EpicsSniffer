@@ -1,0 +1,21 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="EpicsSniffer.PacketListItem">
+  <Grid>
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition />
+      <ColumnDefinition />
+      <ColumnDefinition />
+      <ColumnDefinition />
+      <ColumnDefinition />
+    </Grid.ColumnDefinitions>
+    <TextBlock x:Name="lblNumber" Grid.Column="0" Text="{Binding PacketNumber}" >-</TextBlock>
+    <TextBlock x:Name="lblSource" Grid.Column="1" Text="{Binding PacketSource}" >-</TextBlock>
+    <TextBlock x:Name="lblDestination" Grid.Column="2" Text="{Binding PacketDestination}" >-</TextBlock>
+    <TextBlock x:Name="lblProtocol" Grid.Column="3" Text="{Binding PacketProtocol}" >-</TextBlock>
+    <TextBlock x:Name="lblLength" Grid.Column="4" Text="{Binding PacketLength}" >-</TextBlock>
+  </Grid>
+</UserControl>
