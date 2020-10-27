@@ -4,7 +4,16 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="EpicsSniffer.PacketListItem">
-  <Grid>
+  <Grid Tapped="RowClick_Event" x:Name="rowGrid">
+    <Grid.Styles>
+      <Style Selector="Grid">
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Background" Value="White" />
+      </Style>
+      <Style Selector="Grid:pointerover">
+        <Setter Property="Background" Value="#E0E0FF" />
+      </Style>
+    </Grid.Styles>
     <Grid.ColumnDefinitions>
       <ColumnDefinition />
       <ColumnDefinition />

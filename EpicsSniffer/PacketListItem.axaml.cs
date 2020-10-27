@@ -1,6 +1,9 @@
 ﻿using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
+using Avalonia.Media;
+using PCapReader;
 using ReactiveUI;
 
 namespace EpicsSniffer
@@ -46,6 +49,21 @@ namespace EpicsSniffer
         }
 
         public PacketListItemViewModel Model { get; private set; } = new PacketListItemViewModel { };
+        bool selected = false;
+        private Grid rowGrid;
+
+        public bool Selected
+        {
+            get
+            {
+                return selected;
+            }
+            set
+            {
+                selected = value;
+                rowGrid.Background = (Selected ? new SolidColorBrush(Color.FromArgb(0xFF, 0xFF, 0xE0, 0xE0)) : Brushes.White);
+            }
+        }
 
         public int PacketNumber
         {
@@ -107,6 +125,8 @@ namespace EpicsSniffer
             }
         }
 
+        public PCapPacket Packet { get; internal set; }
+
         public PacketListItem()
         {
             this.DataContext = Model;
@@ -116,6 +136,15 @@ namespace EpicsSniffer
         private void InitializeComponent()
         {
             AvaloniaXamlLoader.Load(this);
+            rowGrid = this.FindControl<Grid>("rowGrid");
+        }
+
+        public delegate void ClickEventDelegate(object sender, RoutedEventArgs e);
+        public event ClickEventDelegate Click;
+
+        private void RowClick_Event(object sender, RoutedEventArgs e)
+        {
+            Click?.Invoke(this, e);
         }
     }
 }

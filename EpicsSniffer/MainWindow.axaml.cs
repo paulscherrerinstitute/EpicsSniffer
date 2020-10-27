@@ -9,6 +9,9 @@ namespace EpicsSniffer
 {
     public class MainWindow : Window
     {
+        private Panel scrollPanel;
+        private HexViewer hexViewer;
+
         public MainWindow()
         {
             InitializeComponent();
@@ -21,7 +24,8 @@ namespace EpicsSniffer
         {
             AvaloniaXamlLoader.Load(this);
 
-            var scrollPanel = this.FindControl<Panel>("scrollPanel");
+            scrollPanel = this.FindControl<Panel>("scrollPanel");
+            hexViewer = this.FindControl<HexViewer>("hexViewer");
 
             using (var pCap = new PCapFile(new FileStream("network.pcap", FileMode.Open, FileAccess.Read, FileShare.ReadWrite)))
             {
@@ -36,8 +40,22 @@ namespace EpicsSniffer
                     PacketDestination = p.Destination,
                     PacketProtocol = p.PacketType.ToString(),
                     PacketLength = p.Data.Length,
+                    Packet = p
                 }));
+                foreach (var item in scrollPanel.Children.Cast<PacketListItem>())
+                    item.Click += Item_Click;
             }
+        }
+
+        PacketListItem seletedItem = null;
+
+        private void Item_Click(object sender, Avalonia.Interactivity.RoutedEventArgs e)
+        {
+            if (seletedItem != null)
+                seletedItem.Selected = false;
+            seletedItem = (PacketListItem)sender;
+            hexViewer.Data = seletedItem.Packet.Data;
+            seletedItem.Selected = true;
         }
     }
 }

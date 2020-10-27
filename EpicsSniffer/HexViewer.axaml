@@ -1,0 +1,26 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="EpicsSniffer.HexViewer">
+  <ScrollViewer>
+    <Grid>
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="40" />
+        <ColumnDefinition Width="400"/>
+        <ColumnDefinition />
+      </Grid.ColumnDefinitions>
+      <Grid.Styles>
+        <Style Selector="TextBlock">
+          <Setter Property="FontFamily" Value="Courier New" />
+        </Style>
+      </Grid.Styles>
+      <Border Background="#C0C0C0"  Grid.Column="0" Width="40">
+        <TextBlock x:Name="txtPositions" Margin="3"/>
+      </Border>
+      <TextBlock x:Name="txtHex" Grid.Column="1" Margin="3" />
+      <TextBlock x:Name="txtVisual" Grid.Column="2" Margin="3" />
+    </Grid>
+  </ScrollViewer>
+</UserControl>
