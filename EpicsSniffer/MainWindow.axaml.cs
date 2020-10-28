@@ -15,6 +15,7 @@ namespace EpicsSniffer
     {
         private Panel scrollPanel;
         private Panel detailContainer;
+        private TextBox txtFilter;
 
         public MainWindow()
         {
@@ -30,6 +31,7 @@ namespace EpicsSniffer
 
             scrollPanel = this.FindControl<Panel>("scrollPanel");
             detailContainer = this.FindControl<Panel>("detailContainer");
+            txtFilter = this.FindControl<TextBox>("txtFilter");
             this.KeyDown += MainWindow_KeyDown;
         }
 
@@ -83,26 +85,42 @@ namespace EpicsSniffer
         {
             using (var pCap = new PCapFile(new FileStream(filename, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)))
             {
-                scrollPanel.Children.Clear();
-                seletedItem = null;
 
-                var source = pCap.Where(p => p.PacketType != PCapPacketType.Other && !(p.IsBaseIpProtocol
+                DataPackets = pCap.Where(p => p.PacketType != PCapPacketType.Other && !(p.IsBaseIpProtocol
                     || (p.PortSource == 0 && p.PortDestination == 0)
                     || p.Data == null
-                    || p.Data.Length == 0));
-                scrollPanel.Children.AddRange(source.Select(p => new PacketListItem
-                {
-                    PacketNumber = p.PacketNumber,
-                    PacketSource = p.Source,
-                    PacketDestination = p.Destination,
-                    PacketProtocol = p.PacketType.ToString(),
-                    PacketLength = p.Data.Length,
-                    Packet = p,
-                    Foreground = Colorize(p.Data)
-                }));
-                foreach (var item in scrollPanel.Children.Cast<PacketListItem>())
-                    item.Click += Item_Click;
+                    || p.Data.Length == 0)).ToList();
+
+                txtFilter.Text = "";
+                ShowDataPacket();
             }
+        }
+
+        private void ShowDataPacket()
+        {
+            var filter = txtFilter.Text.ToLower();
+            var source = DataPackets.Where(row => row.Source.Contains(filter) || row.Destination.Contains(filter) || row.PacketType.ToString().ToLower().Contains(filter) || row.PacketNumber.ToString().Contains(filter));
+
+            scrollPanel.Children.Clear();
+            detailContainer.Children.Clear();
+            seletedItem = null;
+            scrollPanel.Children.AddRange(source.Select(p => new PacketListItem
+            {
+                PacketNumber = p.PacketNumber,
+                PacketSource = p.Source,
+                PacketDestination = p.Destination,
+                PacketProtocol = p.PacketType.ToString(),
+                PacketLength = p.Data.Length,
+                Packet = p,
+                Foreground = Colorize(p.Data)
+            }));
+            foreach (var item in scrollPanel.Children.Cast<PacketListItem>())
+                item.Click += Item_Click;
+        }
+
+        private void Filter_Changed(object sender, Avalonia.Input.KeyEventArgs e)
+        {
+            ShowDataPacket();
         }
 
         private IBrush Colorize(byte[] data)
@@ -117,6 +135,8 @@ namespace EpicsSniffer
         }
 
         PacketListItem seletedItem = null;
+
+        public List<PCapPacket> DataPackets { get; private set; }
 
         private void Item_Click(object sender, Avalonia.Interactivity.RoutedEventArgs e)
         {

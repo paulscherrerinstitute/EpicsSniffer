@@ -7,7 +7,7 @@
         x:Class="EpicsSniffer.MainWindow"
         Title="EpicsSniffer">
   <DockPanel>
-    <Menu DockPanel.Dock="Top">
+    <Menu DockPanel.Dock="Top" Background="LightBlue" Padding="3">
       <Menu.Styles>
         <Style Selector="ScrollViewer">
           <Setter Property="VerticalScrollBarVisibility" Value="Hidden" />
@@ -19,7 +19,7 @@
         <MenuItem Header="_Exit" Click="Menu_Exit"/>
       </MenuItem>
       <MenuItem Header="_Edit">
-        <MenuItem Header="Copy" Click="Menu_Copy"/>
+        <MenuItem Header="Copy" Click="Menu_Copy" />
       </MenuItem>
     </Menu>
 
@@ -30,7 +30,7 @@
         <RowDefinition Height="50*" />
       </Grid.RowDefinitions>
 
-      <TextBox Grid.Row="0" Margin="3" BorderBrush="#C0C0C0" />
+      <TextBox Grid.Row="0" Margin="3" BorderBrush="#C0C0C0" x:Name="txtFilter" KeyUp="Filter_Changed" Watermark="Search..." />
       <Border BorderBrush="#C0C0C0" BorderThickness="1" Margin="3" Grid.Row="1">
         <Grid>
           <Grid.RowDefinitions>
@@ -76,5 +76,4 @@
       </Border>
     </Grid>
   </DockPanel>
-
 </Window>
