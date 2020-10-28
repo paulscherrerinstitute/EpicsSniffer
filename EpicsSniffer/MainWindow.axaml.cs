@@ -132,7 +132,7 @@ namespace EpicsSniffer
                     {
                         Source = seletedItem.Packet.Source,
                         Destination = seletedItem.Packet.Destination,
-                        Command = $"0x{pvPacket.Command:X2}",
+                        Command = $"0x{(int)pvPacket.Command:X2} {pvPacket.Command.ToString()}",
                         Flags = pvPacket.Flag.ToString(),
                         PayloadSize = pvPacket.Data.Length - 8
                     });

@@ -19,6 +19,33 @@ namespace EpicsSniffer
         BigEndian = 512
     }
 
+    enum PvCommand : int
+    {
+        Beacon = 0x0,
+        ConnectionValidation = 0x1,
+        Echo = 0x2,
+        Search = 0x3,
+        SearchResponse = 0x4,
+        Auth = 0x5,
+        AclChange = 0x6,
+        CreateChannel = 0x7,
+        DestroyChannel = 0x8,
+        ConnectionValidated = 0x9,
+        Get = 0xA,
+        Put = 0xB,
+        PutGet = 0xC,
+        Monitor = 0xD,
+        Array = 0xE,
+        DestroyRequest = 0xF,
+        Process = 0x10,
+        GetField = 0x11,
+        Message = 0x12,
+        MultipleData = 0x13,
+        RPC = 0x14,
+        CancelRequest = 0x15,
+        OriginTag = 0x16
+    }
+
     class PvPacket
     {
         public byte[] Data { get; set; }
@@ -26,7 +53,7 @@ namespace EpicsSniffer
         bool IsBigEndian => ((Data[2] & (1 << 7)) != 0);
         bool IsFromServer => ((Data[2] & (1 << 6)) != 0);
 
-        public int Command => Data[3];
+        public PvCommand Command => (PvCommand)Data[3];
 
         public uint ReadUInt32(int offset)
         {
