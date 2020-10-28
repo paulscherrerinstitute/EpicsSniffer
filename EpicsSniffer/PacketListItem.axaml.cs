@@ -5,6 +5,7 @@ using Avalonia.Markup.Xaml;
 using Avalonia.Media;
 using PCapReader;
 using ReactiveUI;
+using System.Linq;
 
 namespace EpicsSniffer
 {
@@ -62,6 +63,24 @@ namespace EpicsSniffer
             {
                 selected = value;
                 rowGrid.Background = (Selected ? new SolidColorBrush(Color.FromArgb(0xFF, 0xFF, 0xE0, 0xE0)) : Brushes.White);
+            }
+        }
+
+        IBrush foreground = Brushes.Black;
+        public IBrush Foreground
+        {
+            get
+            {
+                return foreground;
+            }
+            set
+            {
+                foreground = value;
+                foreach (var t in rowGrid.Children.Cast<TextBlock>())
+                {
+                    t.Foreground = foreground;
+                    t.FontWeight = (foreground != Brushes.Black ? FontWeight.Bold : FontWeight.Normal);
+                }
             }
         }
 

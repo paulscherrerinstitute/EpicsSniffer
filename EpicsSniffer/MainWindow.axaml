@@ -6,51 +6,70 @@
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="EpicsSniffer.MainWindow"
         Title="EpicsSniffer">
-  <Grid>
-    <Grid.RowDefinitions>
-      <RowDefinition Height="Auto" />
-      <RowDefinition Height="50*" />
-      <RowDefinition Height="50*" />
-    </Grid.RowDefinitions>
+  <DockPanel>
+    <Menu DockPanel.Dock="Top">
+      <Menu.Styles>
+        <Style Selector="ScrollViewer">
+          <Setter Property="VerticalScrollBarVisibility" Value="Hidden" />
+        </Style>
+      </Menu.Styles>
+      <MenuItem Header="_File">
+        <MenuItem Header="_Open..." Click="Menu_Open"/>
+        <Separator/>
+        <MenuItem Header="_Exit" Click="Menu_Exit"/>
+      </MenuItem>
+      <MenuItem Header="_Edit">
+        <MenuItem Header="Copy" Click="Menu_Copy"/>
+      </MenuItem>
+    </Menu>
 
-    <TextBox Grid.Row="0" Margin="3" BorderBrush="#C0C0C0" />
-    <Border BorderBrush="#C0C0C0" BorderThickness="1" Margin="3" Grid.Row="1">
-      <Grid>
-        <Grid.RowDefinitions>
-          <RowDefinition Height="Auto" />
-          <RowDefinition />
-        </Grid.RowDefinitions>
-        <Grid Margin="1,1,21,0" Background="#E0E0E0">
-          <Grid.ColumnDefinitions>
-            <ColumnDefinition />
-            <ColumnDefinition />
-            <ColumnDefinition />
-            <ColumnDefinition />
-            <ColumnDefinition />
-          </Grid.ColumnDefinitions>
-          <Grid.Styles>
-            <Style Selector="TextBlock">
-              <Setter Property="FontWeight" Value="Bold" />
-              <Setter Property="Margin" Value="3" />
-            </Style>
-          </Grid.Styles>
-          <TextBlock Grid.Column="0">No.</TextBlock>
-          <TextBlock Grid.Column="1">Source</TextBlock>
-          <TextBlock Grid.Column="2">Destination</TextBlock>
-          <TextBlock Grid.Column="3">Type</TextBlock>
-          <TextBlock Grid.Column="4">Size</TextBlock>
-        </Grid>
-        <ScrollViewer x:Name="scrollContainer" Margin="1" Grid.Row="1" VerticalScrollBarVisibility="Visible">
-          <StackPanel x:Name="scrollPanel">
-            <StackPanel.Styles>
+    <Grid>
+      <Grid.RowDefinitions>
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="50*" />
+        <RowDefinition Height="50*" />
+      </Grid.RowDefinitions>
+
+      <TextBox Grid.Row="0" Margin="3" BorderBrush="#C0C0C0" />
+      <Border BorderBrush="#C0C0C0" BorderThickness="1" Margin="3" Grid.Row="1">
+        <Grid>
+          <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition />
+          </Grid.RowDefinitions>
+          <Grid Margin="1,1,21,0" Background="#E0E0E0">
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition />
+              <ColumnDefinition />
+              <ColumnDefinition />
+              <ColumnDefinition />
+              <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+            <Grid.Styles>
               <Style Selector="TextBlock">
+                <Setter Property="FontWeight" Value="Bold" />
                 <Setter Property="Margin" Value="3" />
               </Style>
-            </StackPanel.Styles>
-          </StackPanel>
-        </ScrollViewer>
-      </Grid>
-    </Border>
-    <uc:HexViewer Grid.Row="2" Margin="3" x:Name="hexViewer" />
-  </Grid>
+            </Grid.Styles>
+            <TextBlock Grid.Column="0">No.</TextBlock>
+            <TextBlock Grid.Column="1">Source</TextBlock>
+            <TextBlock Grid.Column="2">Destination</TextBlock>
+            <TextBlock Grid.Column="3">Type</TextBlock>
+            <TextBlock Grid.Column="4">Size</TextBlock>
+          </Grid>
+          <ScrollViewer x:Name="scrollContainer" Margin="1" Grid.Row="1" VerticalScrollBarVisibility="Visible">
+            <StackPanel x:Name="scrollPanel">
+              <StackPanel.Styles>
+                <Style Selector="TextBlock">
+                  <Setter Property="Margin" Value="3" />
+                </Style>
+              </StackPanel.Styles>
+            </StackPanel>
+          </ScrollViewer>
+        </Grid>
+      </Border>
+      <uc:HexViewer Grid.Row="2" Margin="3" x:Name="hexViewer" />
+    </Grid>
+  </DockPanel>
+
 </Window>
