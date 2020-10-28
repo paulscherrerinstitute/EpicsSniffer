@@ -14,7 +14,7 @@ namespace EpicsSniffer
     public class MainWindow : Window
     {
         private Panel scrollPanel;
-        private HexViewer hexViewer;
+        private Panel detailContainer;
 
         public MainWindow()
         {
@@ -29,9 +29,54 @@ namespace EpicsSniffer
             AvaloniaXamlLoader.Load(this);
 
             scrollPanel = this.FindControl<Panel>("scrollPanel");
-            hexViewer = this.FindControl<HexViewer>("hexViewer");
+            detailContainer = this.FindControl<Panel>("detailContainer");
+            this.KeyDown += MainWindow_KeyDown;
+        }
 
-            LoadFile("network.pcap");
+        private void MainWindow_KeyDown(object sender, Avalonia.Input.KeyEventArgs e)
+        {
+            if (e.Key == Avalonia.Input.Key.Down)
+            {
+                var items = scrollPanel.Children.Cast<PacketListItem>().ToList();
+                if (seletedItem == null && items.Count() != 0)
+                {
+                    items.First().Select();
+                }
+                else if (seletedItem != null)
+                {
+                    for (int i = 0; i < items.Count(); i++)
+                        if (items[i] == seletedItem)
+                        {
+                            i++;
+                            if (i >= items.Count())
+                                break;
+                            items[i].Select();
+                            seletedItem.BringIntoView();
+                            break;
+                        }
+                }
+            }
+            else if (e.Key == Avalonia.Input.Key.Up)
+            {
+                var items = scrollPanel.Children.Cast<PacketListItem>().ToList();
+                if (seletedItem == null && items.Count() != 0)
+                {
+                    items.First().Select();
+                }
+                else if (seletedItem != null)
+                {
+                    for (int i = 0; i < items.Count(); i++)
+                        if (items[i] == seletedItem)
+                        {
+                            i--;
+                            if (i < 0)
+                                break;
+                            items[i].Select();
+                            seletedItem.BringIntoView();
+                            break;
+                        }
+                }
+            }
         }
 
         private void LoadFile(string filename)
@@ -66,7 +111,7 @@ namespace EpicsSniffer
                 return Brushes.Black;
             if (data[0] != 0xCA)
                 return Brushes.Black;
-            if(data[3] == 0x03)
+            if ((data[2] & (1 << 6)) == 0)
                 return Brushes.DarkGreen;
             return Brushes.DarkRed;
         }
@@ -78,7 +123,27 @@ namespace EpicsSniffer
             if (seletedItem != null)
                 seletedItem.Selected = false;
             seletedItem = (PacketListItem)sender;
-            hexViewer.Data = seletedItem.Packet.Data;
+            detailContainer.Children.Clear();
+            if (seletedItem.Packet.Data[0] == 0xCA) // Pv Packet
+            {
+                foreach (var pvPacket in PvPacket.Split(seletedItem.Packet.Data))
+                {
+                    detailContainer.Children.Add(new PvDetails
+                    {
+                        Source = seletedItem.Packet.Source,
+                        Destination = seletedItem.Packet.Destination,
+                        Command = $"0x{pvPacket.Command:X2}",
+                        Flags = pvPacket.Flag.ToString(),
+                        PayloadSize = pvPacket.Data.Length - 8
+                    });
+                    detailContainer.Children.Add(new HexViewer { Data = pvPacket.Data });
+                }
+            }
+            else
+            {
+                detailContainer.Children.Add(new HexViewer { Data = seletedItem.Packet.Data });
+            }
+
             seletedItem.Selected = true;
         }
         private void Menu_Open(object sender, Avalonia.Interactivity.RoutedEventArgs e)

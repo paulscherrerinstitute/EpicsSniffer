@@ -161,6 +161,11 @@ namespace EpicsSniffer
         public delegate void ClickEventDelegate(object sender, RoutedEventArgs e);
         public event ClickEventDelegate Click;
 
+        public void Select()
+        {
+            this.RowClick_Event(this, null);
+        }
+
         private void RowClick_Event(object sender, RoutedEventArgs e)
         {
             Click?.Invoke(this, e);

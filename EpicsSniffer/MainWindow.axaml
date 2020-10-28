@@ -68,7 +68,12 @@
           </ScrollViewer>
         </Grid>
       </Border>
-      <uc:HexViewer Grid.Row="2" Margin="3" x:Name="hexViewer" />
+      <Border BorderBrush="#C0C0C0" BorderThickness="1" Margin="3, 0, 3, 3" Grid.Row="2">
+        <ScrollViewer Margin="1" Grid.Row="1" VerticalScrollBarVisibility="Visible">
+          <StackPanel x:Name="detailContainer">
+          </StackPanel>
+        </ScrollViewer>
+      </Border>
     </Grid>
   </DockPanel>
 

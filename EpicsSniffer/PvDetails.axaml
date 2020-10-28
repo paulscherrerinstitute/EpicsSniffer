@@ -1,0 +1,42 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="EpicsSniffer.PvDetails">
+  <Grid Background="LightBlue">
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition Width="100" />
+      <ColumnDefinition />
+    </Grid.ColumnDefinitions>
+    <Grid.RowDefinitions>
+      <RowDefinition />
+      <RowDefinition />
+      <RowDefinition />
+      <RowDefinition />
+      <RowDefinition />
+      <RowDefinition />
+    </Grid.RowDefinitions>
+    <Grid.Styles>
+      <Style Selector="TextBlock">
+        <Setter Property="Margin" Value="1" />
+      </Style>
+    </Grid.Styles>
+    <TextBlock Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="0" FontSize="18" FontWeight="Bold">PV Access Message</TextBlock>
+    
+    <TextBlock Grid.Column="0" Grid.Row="1" FontWeight="Bold">Source:</TextBlock>
+    <TextBlock Grid.Column="1" Grid.Row="1" Text="{Binding Source}"/>
+
+    <TextBlock Grid.Column="0" Grid.Row="2" FontWeight="Bold">Destination:</TextBlock>
+    <TextBlock Grid.Column="1" Grid.Row="2" Text="{Binding Destination}"/>
+
+    <TextBlock Grid.Column="0" Grid.Row="3" FontWeight="Bold">Command:</TextBlock>
+    <TextBlock Grid.Column="1" Grid.Row="3" Text="{Binding Command}"/>
+
+    <TextBlock Grid.Column="0" Grid.Row="4" FontWeight="Bold">Flags:</TextBlock>
+    <TextBlock Grid.Column="1" Grid.Row="4" Text="{Binding Flags}"/>
+
+    <TextBlock Grid.Column="0" Grid.Row="5" FontWeight="Bold">Payload Size:</TextBlock>
+    <TextBlock Grid.Column="1" Grid.Row="5" Text="{Binding PayloadSize}"/>
+  </Grid>
+</UserControl>
