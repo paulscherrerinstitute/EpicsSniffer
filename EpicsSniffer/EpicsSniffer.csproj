@@ -2,7 +2,14 @@
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
+    <ApplicationIcon>icon_300x300.ico</ApplicationIcon>
   </PropertyGroup>
+  <ItemGroup>
+    <None Remove="icon_300x300.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="icon_300x300.png" />
+  </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Avalonia" Version="0.9.12" />
     <PackageReference Include="Avalonia.Desktop" Version="0.9.12" />

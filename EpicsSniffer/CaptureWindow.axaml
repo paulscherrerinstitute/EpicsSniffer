@@ -4,6 +4,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         x:Class="EpicsSniffer.CaptureWindow"
         mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="140"
+        WindowStartupLocation="CenterOwner"
+        Icon="resm:EpicsSniffer.icon_300x300.png"        
         Title="Network Capture" Width="400" Height="140">
   <StackPanel Orientation="Vertical">
     <TextBlock Margin="3" TextWrapping="Wrap" >

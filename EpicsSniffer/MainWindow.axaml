@@ -7,6 +7,7 @@
         MinWidth="300"
         MinHeight="300"
         x:Class="EpicsSniffer.MainWindow"
+        Icon="resm:EpicsSniffer.icon_300x300.png"
         Title="EpicsSniffer">
   <DockPanel>
     <Menu DockPanel.Dock="Top" Background="LightBlue" Padding="3">

@@ -192,13 +192,24 @@ namespace EpicsSniffer
                     sniffer.ReceivedPacket -= Sniffer_ReceivedPacket;
                     sniffer.Dispose();
                 }
-                sniffer = new NetworkSniffer(result.Result);
-                sniffer.ReceivedPacket += Sniffer_ReceivedPacket;
                 Avalonia.Threading.Dispatcher.UIThread.Post(() =>
                 {
-                    DataPackets = new List<PCapPacket>();
-                    ShowDataPacket();
-                    mnuStopCapture.IsEnabled = true;
+                    try
+                    {
+                        sniffer = new NetworkSniffer(result.Result);
+                    }
+                    catch(System.Net.Sockets.SocketException ex)
+                    {
+                        var dlg = new AdminRightsRequired();
+                        dlg.ShowDialog(this);
+                    }
+                    if (sniffer != null)
+                    {
+                        sniffer.ReceivedPacket += Sniffer_ReceivedPacket;
+                        DataPackets = new List<PCapPacket>();
+                        ShowDataPacket();
+                        mnuStopCapture.IsEnabled = true;
+                    }
                 });
             });
         }
