@@ -16,6 +16,7 @@ namespace EpicsSniffer
         private Panel scrollPanel;
         private Panel detailContainer;
         private TextBox txtFilter;
+        private MenuItem mnuStopCapture;
 
         public MainWindow()
         {
@@ -32,6 +33,7 @@ namespace EpicsSniffer
             scrollPanel = this.FindControl<Panel>("scrollPanel");
             detailContainer = this.FindControl<Panel>("detailContainer");
             txtFilter = this.FindControl<TextBox>("txtFilter");
+            mnuStopCapture = this.FindControl<MenuItem>("mnuStopCapture");
             this.KeyDown += MainWindow_KeyDown;
         }
 
@@ -166,6 +168,26 @@ namespace EpicsSniffer
 
             seletedItem.Selected = true;
         }
+
+        private void Menu_Capture(object sender, Avalonia.Interactivity.RoutedEventArgs e)
+        {
+            var capture = new CaptureWindow();
+            capture.ShowDialog<string>(this).ContinueWith(result =>
+            {
+                if (result.Result == null)
+                    return;
+                Avalonia.Threading.Dispatcher.UIThread.Post(() =>
+                {
+                    mnuStopCapture.IsEnabled = true;
+                });
+            });
+        }
+
+        private void Menu_StopCapture(object sender, Avalonia.Interactivity.RoutedEventArgs e)
+        {
+            mnuStopCapture.IsEnabled = false;
+        }
+
         private void Menu_Open(object sender, Avalonia.Interactivity.RoutedEventArgs e)
         {
             var open = new OpenFileDialog();
@@ -189,58 +211,67 @@ namespace EpicsSniffer
         {
             if (seletedItem == null)
                 return;
-            var data = seletedItem.Packet.Data;
+            var fullData = seletedItem.Packet.Data;
 
-            var hex = new StringBuilder();
-            var chars = new StringBuilder();
-            var posString = new StringBuilder();
             var fullText = new StringBuilder();
 
-            int nbInRow = 0;
-            int pos = 0;
-            foreach (var b in data)
+            foreach (var p in PvPacket.Split(fullData))
             {
-                if (nbInRow == 0)
-                    posString.Append($"{pos:X4}");
-                else
-                    hex.Append(' ');
-                if (nbInRow == 8)
+                if (fullText.Length != 0)
+                    fullText.Append("\n\n");
+
+                var data = p.Data;
+
+                var hex = new StringBuilder();
+                var chars = new StringBuilder();
+                var posString = new StringBuilder();
+
+                int nbInRow = 0;
+                int pos = 0;
+                foreach (var b in data)
                 {
-                    hex.Append(" ");
-                    chars.Append(" ");
+                    if (nbInRow == 0)
+                        posString.Append($"{pos:X4}");
+                    else
+                        hex.Append(' ');
+                    if (nbInRow == 8)
+                    {
+                        hex.Append(" ");
+                        chars.Append(" ");
+                    }
+                    if ((b >= 'a' && b <= 'z') || (b >= 'A' && b <= 'Z') || (b >= '1' && b <= '0') || ",;:+\"*%&/()=?^~[]{}§-_".Contains((char)b))
+                        chars.Append((char)b);
+                    else
+                        chars.Append('.');
+                    hex.Append($"{b:X2}");
+                    nbInRow++;
+                    pos++;
+                    if (nbInRow >= 16)
+                    {
+                        nbInRow = 0;
+                        fullText.Append(posString.ToString());
+                        fullText.Append("    ");
+                        fullText.Append(hex.ToString());
+                        fullText.Append("  ");
+                        fullText.Append(chars.ToString());
+                        fullText.Append("\n");
+
+                        posString.Clear();
+                        hex.Clear();
+                        chars.Clear();
+                    }
                 }
-                if ((b >= 'a' && b <= 'z') || (b >= 'A' && b <= 'Z') || (b >= '1' && b <= '0') || ",;:+\"*%&/()=?^~[]{}§-_".Contains((char)b))
-                    chars.Append((char)b);
-                else
-                    chars.Append('.');
-                hex.Append($"{b:X2}");
-                nbInRow++;
-                pos++;
-                if (nbInRow >= 16)
+
+                if (posString.ToString().Length > 0)
                 {
-                    nbInRow = 0;
                     fullText.Append(posString.ToString());
                     fullText.Append("    ");
                     fullText.Append(hex.ToString());
+                    fullText.Append(new string(' ', 48 - hex.ToString().Length));
                     fullText.Append("  ");
                     fullText.Append(chars.ToString());
                     fullText.Append("\n");
-
-                    posString.Clear();
-                    hex.Clear();
-                    chars.Clear();
                 }
-            }
-
-            if (posString.ToString().Length > 0)
-            {
-                fullText.Append(posString.ToString());
-                fullText.Append("    ");
-                fullText.Append(hex.ToString());
-                fullText.Append(new string(' ', 48 - hex.ToString().Length));
-                fullText.Append("  ");
-                fullText.Append(chars.ToString());
-                fullText.Append("\n");
             }
             Application.Current.Clipboard.SetTextAsync(fullText.ToString());
         }

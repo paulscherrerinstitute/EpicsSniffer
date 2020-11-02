@@ -4,6 +4,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:uc="clr-namespace:EpicsSniffer"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        MinWidth="300"
+        MinHeight="300"
         x:Class="EpicsSniffer.MainWindow"
         Title="EpicsSniffer">
   <DockPanel>
@@ -12,8 +14,13 @@
         <Style Selector="ScrollViewer">
           <Setter Property="VerticalScrollBarVisibility" Value="Hidden" />
         </Style>
+        <Style Selector="MenuItem">
+          <Setter Property="Background" Value="LightBlue" />
+        </Style>
       </Menu.Styles>
       <MenuItem Header="_File">
+        <MenuItem Header="_Capture..." Click="Menu_Capture"/>
+        <MenuItem Header="_Stop capture" Click="Menu_StopCapture" x:Name="mnuStopCapture"  IsEnabled="False"/>
         <MenuItem Header="_Open..." Click="Menu_Open"/>
         <Separator/>
         <MenuItem Header="_Exit" Click="Menu_Exit"/>
