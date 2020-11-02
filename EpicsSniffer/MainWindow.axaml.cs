@@ -17,6 +17,7 @@ namespace EpicsSniffer
         private Panel detailContainer;
         private TextBox txtFilter;
         private MenuItem mnuStopCapture;
+        private NetworkSniffer sniffer;
 
         public MainWindow()
         {
@@ -87,12 +88,13 @@ namespace EpicsSniffer
         {
             using (var pCap = new PCapFile(new FileStream(filename, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)))
             {
-
-                DataPackets = pCap.Where(p => p.PacketType != PCapPacketType.Other && !(p.IsBaseIpProtocol
+                lock (DataPacketsLock)
+                {
+                    DataPackets = pCap.Where(p => p.PacketType != PCapPacketType.Other && !(p.IsBaseIpProtocol
                     || (p.PortSource == 0 && p.PortDestination == 0)
                     || p.Data == null
                     || p.Data.Length == 0)).ToList();
-
+                }
                 txtFilter.Text = "";
                 ShowDataPacket();
             }
@@ -100,8 +102,16 @@ namespace EpicsSniffer
 
         private void ShowDataPacket()
         {
-            var filter = txtFilter.Text.ToLower();
-            var source = DataPackets.Where(row => row.Source.Contains(filter) || row.Destination.Contains(filter) || row.PacketType.ToString().ToLower().Contains(filter) || row.PacketNumber.ToString().Contains(filter));
+            var filter = txtFilter.Text?.ToLower() ?? "";
+            List<PCapPacket> source;
+            lock (DataPacketsLock)
+            {
+                source = DataPackets.Where(row => row.Source.Contains(filter)
+                         || row.Destination.Contains(filter)
+                         || row.PacketType.ToString().ToLower().Contains(filter)
+                         || row.PacketNumber.ToString().Contains(filter))
+                    .ToList();
+            }
 
             scrollPanel.Children.Clear();
             detailContainer.Children.Clear();
@@ -139,6 +149,7 @@ namespace EpicsSniffer
         PacketListItem seletedItem = null;
 
         public List<PCapPacket> DataPackets { get; private set; }
+        public object DataPacketsLock = new object();
 
         private void Item_Click(object sender, Avalonia.Interactivity.RoutedEventArgs e)
         {
@@ -176,16 +187,49 @@ namespace EpicsSniffer
             {
                 if (result.Result == null)
                     return;
+                if (sniffer != null)
+                {
+                    sniffer.ReceivedPacket -= Sniffer_ReceivedPacket;
+                    sniffer.Dispose();
+                }
+                sniffer = new NetworkSniffer(result.Result);
+                sniffer.ReceivedPacket += Sniffer_ReceivedPacket;
                 Avalonia.Threading.Dispatcher.UIThread.Post(() =>
                 {
+                    DataPackets = new List<PCapPacket>();
+                    ShowDataPacket();
                     mnuStopCapture.IsEnabled = true;
                 });
+            });
+        }
+
+        private void Sniffer_ReceivedPacket(NetworkSniffer sniffer, PCapPacket packet)
+        {
+            if (DataPackets == null)
+                DataPackets = new List<PCapPacket>();
+            if (packet.PacketType != PCapPacketType.Other && !(packet.IsBaseIpProtocol
+                               || (packet.PortSource == 0 && packet.PortDestination == 0)
+                               || packet.Data == null
+                               || packet.Data.Length == 0))
+                lock (DataPacketsLock)
+                {
+                    DataPackets.Add(packet);
+                }
+            Avalonia.Threading.Dispatcher.UIThread.Post(() =>
+            {
+                ShowDataPacket();
             });
         }
 
         private void Menu_StopCapture(object sender, Avalonia.Interactivity.RoutedEventArgs e)
         {
             mnuStopCapture.IsEnabled = false;
+            if (sniffer != null)
+            {
+                sniffer.ReceivedPacket -= Sniffer_ReceivedPacket;
+                sniffer.Dispose();
+            }
+            sniffer = null;
         }
 
         private void Menu_Open(object sender, Avalonia.Interactivity.RoutedEventArgs e)

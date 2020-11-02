@@ -23,7 +23,10 @@ namespace EpicsSniffer
             AvaloniaXamlLoader.Load(this);
 
             networkList = this.FindControl<ComboBox>("networkList");
-            networkList.Items = NetworkInterface.GetAllNetworkInterfaces().Where(row => row.NetworkInterfaceType != NetworkInterfaceType.Tunnel).OrderBy(row => row.Name).Select(row => row.Name + " (" + row.GetIPProperties().UnicastAddresses.First().Address.ToString() + ")");
+            networkList.Items = NetworkInterface.GetAllNetworkInterfaces()
+                .Where(row => row.NetworkInterfaceType != NetworkInterfaceType.Tunnel)
+                .OrderBy(row => row.Name)
+                .Select(row => row.Name + " (" + row.GetIPProperties().UnicastAddresses.First().Address.MapToIPv4().ToString() + ")");
             networkList.SelectedIndex = 0;
         }
 
