@@ -23,6 +23,7 @@ namespace EpicsSniffer
         private void InitializeComponent()
         {
             AvaloniaXamlLoader.Load(this);
+            this.Resize();
         }
     }
 }

@@ -1,0 +1,26 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="EpicsSniffer.RowItem">
+  <Grid x:Name="rowGrid">
+    <Grid.Styles>
+      <Style Selector="Grid">
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Background" Value="White" />
+      </Style>
+      <Style Selector="Grid:pointerover">
+        <Setter Property="Background" Value="#E0E0FF" />
+      </Style>
+    </Grid.Styles>
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition />
+      <ColumnDefinition />
+      <ColumnDefinition />
+    </Grid.ColumnDefinitions>
+    <TextBlock x:Name="lblCol0" Grid.Column="0" Text="{Binding Col0}" >-</TextBlock>
+    <TextBlock x:Name="lblCol1" Grid.Column="1" Text="{Binding Col1}" >-</TextBlock>
+    <TextBlock x:Name="lblCol2" Grid.Column="2" Text="{Binding Col2}" >-</TextBlock>
+  </Grid>
+</UserControl>

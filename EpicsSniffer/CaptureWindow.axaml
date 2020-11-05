@@ -6,23 +6,23 @@
         mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="140"
         WindowStartupLocation="CenterOwner"
         Icon="resm:EpicsSniffer.icon_300x300.png"        
-        Title="Network Capture" Width="400" Height="140">
-  <StackPanel Orientation="Vertical">
-    <TextBlock Margin="3" TextWrapping="Wrap" >
-      Select here the network interface which will be used to capture the traffic.
-Keep in mind that if the current computer is linked to a switch it may not
-receive all the packets due to the filtering of the switch itself. In that case
-the switch needs to be configured to copy the traffic to the port used.
-    </TextBlock>
-    <Grid>
+        Title="Network Capture" Width="470" Height="180">
+  <Grid>
+    <Grid.RowDefinitions>
+      <RowDefinition />
+      <RowDefinition />
+      <RowDefinition />
+    </Grid.RowDefinitions>
+    <TextBlock Grid.Row="0" Margin="3, 3, 3, 10" TextWrapping="Wrap" HorizontalAlignment="Stretch" >Select here the network interface which will be used to capture the traffic. Keep in mind that if the current computer is linked to a switch it may not receive all the packets due to the filtering of the switch itself. In that case the switch needs to be configured to copy the traffic to the port used.</TextBlock>
+    <Grid Grid.Row="1">
       <Grid.ColumnDefinitions>
         <ColumnDefinition Width="Auto" />
         <ColumnDefinition Width="1*"/>
       </Grid.ColumnDefinitions>
       <TextBlock Text="Network interface:" Grid.Column="0" Margin="3" VerticalAlignment="Center" FontWeight="Bold" />
-      <ComboBox Grid.Column="1" Margin="3" Height="25" x:Name="networkList"></ComboBox>
+      <ComboBox Grid.Column="1" Margin="3,3,3,3" Height="25" x:Name="networkList"></ComboBox>
     </Grid>
-    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+    <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Bottom">
       <StackPanel.Styles>
         <Style Selector="Button">
           <Setter Property="Margin" Value="3"/>
@@ -31,5 +31,5 @@ the switch needs to be configured to copy the traffic to the port used.
       <Button Content="Capture" IsDefault="True" Click="BtnCaptureClick"/>
       <Button Content="Cancel" IsCancel="True" Click="BtnCancelClick"/>
     </StackPanel>
-  </StackPanel>
+  </Grid>
 </Window>

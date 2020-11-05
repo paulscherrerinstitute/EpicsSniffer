@@ -3,6 +3,8 @@ using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 using System.Linq;
 using System.Net.NetworkInformation;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace EpicsSniffer
 {
@@ -28,6 +30,7 @@ namespace EpicsSniffer
                 .OrderBy(row => row.Name)
                 .Select(row => row.Name + " (" + row.GetIPProperties().UnicastAddresses.First().Address.MapToIPv4().ToString() + ")");
             networkList.SelectedIndex = 0;
+            this.Resize();
         }
 
         private void BtnCaptureClick(object sender, Avalonia.Interactivity.RoutedEventArgs e)

@@ -60,6 +60,19 @@ namespace EpicsSniffer
             return PvPacket.ReadUInt32(Data, IsBigEndian, offset);
         }
 
+        public ushort ReadUInt16(int offset)
+        {
+            return PvPacket.ReadUInt16(Data, IsBigEndian, offset);
+        }
+
+        public string ReadString(int offset)
+        {
+            var nb = Data[offset];
+            var strData = new byte[nb];
+            Array.Copy(Data, offset + 1, strData, 0, nb);
+            return ASCIIEncoding.ASCII.GetString(strData);
+        }
+
         public PvPacketFlags Flag
         {
             get
@@ -96,6 +109,15 @@ namespace EpicsSniffer
 
             else
                 return ((uint)data[3 + offset] << 24) | ((uint)data[2 + offset] << 16) | ((uint)data[1 + offset] << 8) | data[0 + offset];
+        }
+
+        private static ushort ReadUInt16(byte[] data, bool isBigEndian, int offset)
+        {
+            if (isBigEndian)
+                return (ushort)(((uint)data[0 + offset] << 8) | data[1 + offset]);
+
+            else
+                return (ushort)(((uint)data[1 + offset] << 8) | data[0 + offset]);
         }
 
         public static IEnumerable<PvPacket> Split(byte[] data)

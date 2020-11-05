@@ -17,6 +17,7 @@ namespace EpicsSniffer
         private Panel detailContainer;
         private TextBox txtFilter;
         private MenuItem mnuStopCapture;
+        private SearchStats searchStats;
         private NetworkSniffer sniffer;
 
         public MainWindow()
@@ -35,6 +36,7 @@ namespace EpicsSniffer
             detailContainer = this.FindControl<Panel>("detailContainer");
             txtFilter = this.FindControl<TextBox>("txtFilter");
             mnuStopCapture = this.FindControl<MenuItem>("mnuStopCapture");
+            searchStats = this.FindControl<SearchStats>("searchStats");
             this.KeyDown += MainWindow_KeyDown;
         }
 
@@ -94,6 +96,13 @@ namespace EpicsSniffer
                     || (p.PortSource == 0 && p.PortDestination == 0)
                     || p.Data == null
                     || p.Data.Length == 0)).ToList();
+
+                    // Clear statistics
+                    searchStats.Clear();
+                    DataPackets.ForEach(row =>
+                    {
+                        if (SearchStats.IsSearchPacket(row)) searchStats.Add(row);
+                    });
                 }
                 txtFilter.Text = "";
                 ShowDataPacket();
@@ -194,12 +203,15 @@ namespace EpicsSniffer
                 }
                 Avalonia.Threading.Dispatcher.UIThread.Post(() =>
                 {
+                    searchStats.Clear();
+
                     try
                     {
                         sniffer = new NetworkSniffer(result.Result);
                     }
-                    catch(System.Net.Sockets.SocketException ex)
+                    catch (System.Net.Sockets.SocketException ex)
                     {
+                        //Console.WriteLine(ex.ToString());
                         var dlg = new AdminRightsRequired();
                         dlg.ShowDialog(this);
                     }
@@ -222,14 +234,39 @@ namespace EpicsSniffer
                                || (packet.PortSource == 0 && packet.PortDestination == 0)
                                || packet.Data == null
                                || packet.Data.Length == 0))
+            {
                 lock (DataPacketsLock)
                 {
                     DataPackets.Add(packet);
                 }
-            Avalonia.Threading.Dispatcher.UIThread.Post(() =>
-            {
-                ShowDataPacket();
-            });
+
+                if(SearchStats.IsSearchPacket(packet))
+                    searchStats.Add(packet);
+
+                // Does the new packet match the filter?
+                var filter = txtFilter.Text?.ToLower() ?? "";
+                if (packet.Source.Contains(filter)
+                         || packet.Destination.Contains(filter)
+                         || packet.PacketType.ToString().ToLower().Contains(filter)
+                         || packet.PacketNumber.ToString().Contains(filter))
+                {
+                    Avalonia.Threading.Dispatcher.UIThread.Post(() =>
+                    {
+                        var item = new PacketListItem
+                        {
+                            PacketNumber = packet.PacketNumber,
+                            PacketSource = packet.Source,
+                            PacketDestination = packet.Destination,
+                            PacketProtocol = packet.PacketType.ToString(),
+                            PacketLength = packet.Data.Length,
+                            Packet = packet,
+                            Foreground = Colorize(packet.Data)
+                        };
+                        item.Click += Item_Click;
+                        scrollPanel.Children.Add(item);
+                    });
+                }
+            }
         }
 
         private void Menu_StopCapture(object sender, Avalonia.Interactivity.RoutedEventArgs e)
@@ -251,7 +288,7 @@ namespace EpicsSniffer
             {
                 Avalonia.Threading.Dispatcher.UIThread.Post(() =>
                 {
-                    if (files.Result.Length == 0)
+                    if (files == null || files.Result == null || files.Result.Length == 0)
                         return;
                     LoadFile(files.Result.First());
                 });
@@ -327,6 +364,35 @@ namespace EpicsSniffer
                     fullText.Append(chars.ToString());
                     fullText.Append("\n");
                 }
+            }
+            Application.Current.Clipboard.SetTextAsync(fullText.ToString());
+        }
+
+        private void Menu_CopyBytes(object sender, Avalonia.Interactivity.RoutedEventArgs e)
+        {
+            if (seletedItem == null)
+                return;
+            var fullData = seletedItem.Packet.Data;
+
+            var fullText = new StringBuilder();
+
+            foreach (var p in PvPacket.Split(fullData))
+            {
+                if (fullText.Length != 0)
+                    fullText.Append("\n\n");
+
+                var data = p.Data;
+
+                fullText.Append("var data=new byte[]{");
+                int pos = 0;
+                foreach (var b in data)
+                {
+                    if (pos != 0)
+                        fullText.Append(", ");
+                    fullText.Append($"0x{b:X2}");
+                    pos++;
+                }
+                fullText.Append("};\n");
             }
             Application.Current.Clipboard.SetTextAsync(fullText.ToString());
         }

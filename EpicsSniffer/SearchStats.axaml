@@ -1,0 +1,114 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="EpicsSniffer.SearchStats">
+  <Grid>
+    <Grid.RowDefinitions>
+      <RowDefinition Height="30*" />
+      <RowDefinition Height="30*" />
+      <RowDefinition Height="30*" />
+    </Grid.RowDefinitions>
+
+    <Border BorderBrush="#C0C0C0" BorderThickness="1" Margin="3" Grid.Row="0">
+      <Grid>
+        <Grid.RowDefinitions>
+          <RowDefinition Height="Auto" />
+          <RowDefinition />
+        </Grid.RowDefinitions>
+        <Grid Margin="1,1,21,0" Background="#E0E0E0">
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition />
+            <ColumnDefinition />
+            <ColumnDefinition />
+          </Grid.ColumnDefinitions>
+          <Grid.Styles>
+            <Style Selector="TextBlock">
+              <Setter Property="FontWeight" Value="Bold" />
+              <Setter Property="Margin" Value="3" />
+            </Style>
+          </Grid.Styles>
+          <TextBlock Grid.Column="0">When</TextBlock>
+          <TextBlock Grid.Column="1">Source</TextBlock>
+          <TextBlock Grid.Column="2">Channel</TextBlock>
+        </Grid>
+        <ScrollViewer Margin="1" Grid.Row="1" VerticalScrollBarVisibility="Visible">
+          <StackPanel x:Name="searchScroll">
+            <StackPanel.Styles>
+              <Style Selector="TextBlock">
+                <Setter Property="Margin" Value="3" />
+              </Style>
+            </StackPanel.Styles>
+          </StackPanel>
+        </ScrollViewer>
+      </Grid>
+    </Border>
+    <Border BorderBrush="#C0C0C0" BorderThickness="1" Margin="3" Grid.Row="1">
+      <Grid>
+        <Grid.RowDefinitions>
+          <RowDefinition Height="Auto" />
+          <RowDefinition />
+        </Grid.RowDefinitions>
+        <Grid Margin="1,1,21,0" Background="#E0E0E0">
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition />
+            <ColumnDefinition />
+            <ColumnDefinition />
+          </Grid.ColumnDefinitions>
+          <Grid.Styles>
+            <Style Selector="TextBlock">
+              <Setter Property="FontWeight" Value="Bold" />
+              <Setter Property="Margin" Value="3" />
+            </Style>
+          </Grid.Styles>
+          <TextBlock Grid.Column="0">Channel</TextBlock>
+          <TextBlock Grid.Column="1">Count</TextBlock>
+          <TextBlock Grid.Column="2">Frequency</TextBlock>
+        </Grid>
+        <ScrollViewer Margin="1" Grid.Row="1" VerticalScrollBarVisibility="Visible">
+          <StackPanel x:Name="searchStatScroll">
+            <StackPanel.Styles>
+              <Style Selector="TextBlock">
+                <Setter Property="Margin" Value="3" />
+              </Style>
+            </StackPanel.Styles>
+          </StackPanel>
+        </ScrollViewer>
+      </Grid>
+    </Border>
+    <Border BorderBrush="#C0C0C0" BorderThickness="1" Margin="3" Grid.Row="2">
+      <Grid>
+        <Grid.RowDefinitions>
+          <RowDefinition Height="Auto" />
+          <RowDefinition />
+        </Grid.RowDefinitions>
+        <Grid Margin="1,1,21,0" Background="#E0E0E0">
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition />
+            <ColumnDefinition />
+            <ColumnDefinition />
+          </Grid.ColumnDefinitions>
+          <Grid.Styles>
+            <Style Selector="TextBlock">
+              <Setter Property="FontWeight" Value="Bold" />
+              <Setter Property="Margin" Value="3" />
+            </Style>
+          </Grid.Styles>
+          <TextBlock Grid.Column="0">Source</TextBlock>
+          <TextBlock Grid.Column="1">Count</TextBlock>
+          <TextBlock Grid.Column="2">Frequency</TextBlock>
+        </Grid>
+        <ScrollViewer Margin="1" Grid.Row="1" VerticalScrollBarVisibility="Visible">
+          <StackPanel x:Name="sourceStatScroll">
+            <StackPanel.Styles>
+              <Style Selector="TextBlock">
+                <Setter Property="Margin" Value="3" />
+              </Style>
+            </StackPanel.Styles>
+          </StackPanel>
+        </ScrollViewer>
+      </Grid>
+    </Border>
+  </Grid>
+</UserControl>
