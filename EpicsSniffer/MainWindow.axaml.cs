@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 
 namespace EpicsSniffer
 {
@@ -211,9 +212,27 @@ namespace EpicsSniffer
                     }
                     catch (System.Net.Sockets.SocketException ex)
                     {
+                        if (sniffer != null)
+                            sniffer.Dispose();
+                        sniffer = null;
+
                         //Console.WriteLine(ex.ToString());
-                        var dlg = new AdminRightsRequired();
-                        dlg.ShowDialog(this);
+                        if (ex.NativeErrorCode == 10049)//  ex.Message == "The requested address is not valid in its context."
+                        {
+                            var dlg = new AdminRightsRequired { Message = "Impossible to bind to this network interface.", Title = "Wrong network interface" };
+                            dlg.ShowDialog(this);
+                        }
+                        else if (ex.NativeErrorCode == 10013)
+                        {
+                            var dlg = new AdminRightsRequired();
+                            dlg.ShowDialog(this);
+                        }
+                        else
+                        {
+                            var dlg = new AdminRightsRequired { Message = ex.Message, Title = "Error while binding" };
+                            dlg.ShowDialog(this);
+                        }
+
                     }
                     if (sniffer != null)
                     {
@@ -240,7 +259,7 @@ namespace EpicsSniffer
                     DataPackets.Add(packet);
                 }
 
-                if(SearchStats.IsSearchPacket(packet))
+                if (SearchStats.IsSearchPacket(packet))
                     searchStats.Add(packet);
 
                 // Does the new packet match the filter?

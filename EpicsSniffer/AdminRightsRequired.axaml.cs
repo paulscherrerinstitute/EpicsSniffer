@@ -6,6 +6,8 @@ namespace EpicsSniffer
 {
     public class AdminRightsRequired : Window
     {
+        private TextBlock message;
+
         public AdminRightsRequired()
         {
             this.InitializeComponent();
@@ -24,6 +26,9 @@ namespace EpicsSniffer
         {
             AvaloniaXamlLoader.Load(this);
             this.Resize();
+            message = this.FindControl<TextBlock>("message");
         }
+
+        public string Message { get => message.Text; set => message.Text = value; }
     }
 }

@@ -11,6 +11,7 @@ namespace EpicsSniffer
     {
         private Socket mainSocket, secondarySocket;
         private byte[] byteData = new byte[65000];
+        private byte[] secondaryByteData = new byte[65000];
         DateTime start = DateTime.UtcNow;
         int packetNumber = 0;
 
@@ -71,7 +72,7 @@ namespace EpicsSniffer
                 }
 
                 //Start receiving the packets asynchronously
-                secondarySocket.BeginReceive(byteData, 0, byteData.Length, SocketFlags.None, new AsyncCallback(OnReceiveSecondary), null);
+                secondarySocket.BeginReceive(secondaryByteData, 0, secondaryByteData.Length, SocketFlags.None, new AsyncCallback(OnReceiveSecondary), null);
             }
         }
 
@@ -79,7 +80,8 @@ namespace EpicsSniffer
         {
             mainSocket.Close();
             mainSocket = null;
-            secondarySocket.Close();
+            if(secondarySocket != null)
+                secondarySocket.Close();
             secondarySocket = null;
         }
 
@@ -130,7 +132,7 @@ namespace EpicsSniffer
                 return;
             }
 
-            var newPacket = PCapPacket.CreateFromBytes(byteData, size);
+            var newPacket = PCapPacket.CreateFromBytes(secondaryByteData, size);
             newPacket.PacketNumber = packetNumber++;
             var diff = DateTime.UtcNow - start;
             newPacket.TimeStampSeconds = (uint)diff.TotalSeconds;
@@ -140,7 +142,7 @@ namespace EpicsSniffer
             // Receive again
             try
             {
-                secondarySocket.BeginReceive(byteData, 0, byteData.Length, SocketFlags.None, new AsyncCallback(OnReceiveSecondary), null);
+                secondarySocket.BeginReceive(secondaryByteData, 0, secondaryByteData.Length, SocketFlags.None, new AsyncCallback(OnReceiveSecondary), null);
             }
             catch (ObjectDisposedException)
             {
