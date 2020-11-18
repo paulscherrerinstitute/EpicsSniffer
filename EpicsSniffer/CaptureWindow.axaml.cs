@@ -28,7 +28,8 @@ namespace EpicsSniffer
             networkList.Items = NetworkInterface.GetAllNetworkInterfaces()
                 .Where(row => row.NetworkInterfaceType != NetworkInterfaceType.Tunnel)
                 .OrderBy(row => row.Name)
-                .Select(row => row.Name + " (" + row.GetIPProperties().UnicastAddresses.First().Address.MapToIPv4().ToString() + ")");
+                .Select(row => row.Name + " (" + row.GetIPProperties().UnicastAddresses.First().Address.ToString() + ")");
+            //.Select(row => row.Name + " (" + row.GetIPProperties().UnicastAddresses.First().Address.MapToIPv4().ToString() + ")");
             networkList.SelectedIndex = 0;
             this.Resize();
         }

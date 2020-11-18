@@ -8,14 +8,16 @@ namespace PCapReader
     class PCapStream : IDisposable
     {
         private bool isBigEndian = false;
-        private Stream stream;
+        //private Stream BaseStream;
         private BinaryReader reader;
         private bool isDisposed = false;
 
+        public Stream BaseStream { get; private set; }
+
         public PCapStream(Stream stream)
         {
-            this.stream = stream;
-            reader = new BinaryReader(this.stream);
+            this.BaseStream = stream;
+            reader = new BinaryReader(this.BaseStream);
             if (reader.ReadUInt32() == 0xA1B2C3D4) // Check the magic and the endian
                 isBigEndian = false;
             else
@@ -27,7 +29,7 @@ namespace PCapReader
             }
         }
 
-        public bool IsEndOfStream => stream.Position >= stream.Length;
+        public bool IsEndOfStream => BaseStream.Position >= BaseStream.Length;
 
         public uint ReadBigEndianUInt32()
         {
@@ -95,7 +97,7 @@ namespace PCapReader
                 return;
             isDisposed = true;
             reader.Dispose();
-            stream.Dispose();
+            BaseStream.Dispose();
         }
     }
 }

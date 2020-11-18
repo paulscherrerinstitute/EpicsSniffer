@@ -17,6 +17,7 @@ namespace PCapReader
         public uint Network { get; private set; }
         private PCapStream stream;
         private int currentPacketNumber = 0;
+        bool? includeNanosecs = null;
 
         public PCapFile(Stream baseStream)
         {
@@ -39,65 +40,44 @@ namespace PCapReader
             result.TimeStampMicroseconds = stream.ReadUInt32();
             result.IncludedLength = stream.ReadUInt32();
             result.ActualLength = stream.ReadUInt32();
+            if (result.IncludedLength > result.ActualLength)
+                throw new FileFormatException("Included length bigger than actual length");
+            //Console.WriteLine("Pk "+ result.PacketNumber+" "+ result.IncludedLength);
 
             if (result.IncludedLength < 14)
                 stream.ReadBytes((int)result.IncludedLength);
             else
             {
+                // Check if we must include nanosecs or not
+                if (!includeNanosecs.HasValue)
+                {
+                    var p = stream.BaseStream.Position;
+                    includeNanosecs = (stream.ReadBigEndianUInt32() == 0); // Let's hope it starts with 0
+                    stream.BaseStream.Seek(p, SeekOrigin.Begin);
+                }
+
+                if (includeNanosecs.Value == true)
+                    stream.ReadBytes(8);
                 result.DestinationMac = stream.ReadBytes(6);
                 result.SourceMac = stream.ReadBytes(6);
                 result.EthernetType = stream.ReadUInt16();
+                Console.WriteLine("Nb: " + result.PacketNumber + ", Type: " + result.EthernetType);
 
-                if (result.EthernetType != 0x8) // Not TCP/IP => we skip
+                if (result.EthernetType == 0x8) // IP4
                 {
-                    stream.ReadBytes((int)result.IncludedLength - 14);
+                    var byVersionAndHeaderLength = stream.ReadByte();
+                    var bytes = stream.ReadBytes((int)result.IncludedLength - 15);
+                    PCapPacket.DecodeIP4(bytes, byVersionAndHeaderLength, bytes.Length, result);
+                }
+                else if (result.EthernetType == 56710) // IP 6?
+                {
+                    var byVersionAndHeaderLength = stream.ReadByte();
+                    var bytes = stream.ReadBytes((int)result.IncludedLength - 15);
+                    PCapPacket.DecodeIP6(bytes, byVersionAndHeaderLength, bytes.Length, result);
                 }
                 else
                 {
-                    // Skip TCP/IP Header
-                    stream.ReadBytes(9);
-                    var protocolType = stream.ReadByte();
-                    if (protocolType == 0x11) // UDP
-                    {
-                        stream.ReadBytes(2); // Checksum
-                        result.IpSource = stream.ReadBytes(4);
-                        result.IpDestination = stream.ReadBytes(4);
-                        result.PortSource = stream.ReadBigEndianUInt16();
-                        result.PortDestination = stream.ReadBigEndianUInt16();
-                        result.PacketType = PCapPacketType.UDP;
-
-                        var udpLength = stream.ReadBigEndianUInt16() - 8;
-                        stream.ReadBigEndianUInt16(); // Checksum
-                        result.Data = stream.ReadBytes(udpLength);
-                        // Skip to end
-                        stream.ReadBytes((int)result.IncludedLength - (42 + udpLength));
-                    }
-                    else if (protocolType == 0x6) // TCP
-                    {
-                        stream.ReadBytes(2); // Checksum
-                        result.IpSource = stream.ReadBytes(4);
-                        result.IpDestination = stream.ReadBytes(4);
-                        result.PortSource = stream.ReadBigEndianUInt16();
-                        result.PortDestination = stream.ReadBigEndianUInt16();
-                        result.PacketType = PCapPacketType.TCP;
-
-                        result.SequenceNumber = stream.ReadBigEndianUInt32();
-                        result.AcknowledgmentNumber = stream.ReadBigEndianUInt32();
-                        result.Flags = stream.ReadBytes(2);
-                        var windowSize = stream.ReadBigEndianUInt16();
-                        stream.ReadBytes(2); // checksum
-                        stream.ReadBytes(2); // urgent pointer
-                        var dataOffset = ((result.Flags[0] & 0b11110000) >> 4) * 4 - 20;
-
-                        stream.ReadBytes(dataOffset); // Skip offset
-
-                        result.Data = stream.ReadBytes((int)result.IncludedLength - (38 + 16 + dataOffset));
-                    }
-                    else
-                    {
-                        result.PacketType = PCapPacketType.Other;
-                        stream.ReadBytes((int)result.IncludedLength - 24);
-                    }
+                    stream.ReadBytes((int)result.IncludedLength - 14);
                 }
             }
             return result;

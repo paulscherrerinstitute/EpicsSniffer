@@ -147,7 +147,7 @@ namespace EpicsSniffer
 
         private IBrush Colorize(byte[] data)
         {
-            if (data.Length < 2)
+            if (data.Length < 3)
                 return Brushes.Black;
             if (data[0] != 0xCA)
                 return Brushes.Black;

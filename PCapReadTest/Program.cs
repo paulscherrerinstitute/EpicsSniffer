@@ -8,7 +8,8 @@ namespace PCapReadTest
     {
         static void Main(string[] args)
         {
-            using (var pCap = new PCapFile(new FileStream("network.pcap", FileMode.Open, FileAccess.Read, FileShare.ReadWrite)))
+            //using (var pCap = new PCapFile(new FileStream("network.pcap", FileMode.Open, FileAccess.Read, FileShare.ReadWrite)))
+            using (var pCap = new PCapFile(new FileStream(@"c:\temp\ip_mix.pcap", FileMode.Open, FileAccess.Read, FileShare.ReadWrite)))
             {
                 while (pCap.HasPacket)
                 {

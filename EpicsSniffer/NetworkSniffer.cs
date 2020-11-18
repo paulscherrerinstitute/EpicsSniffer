@@ -19,19 +19,22 @@ namespace EpicsSniffer
         {
             try
             {
-                mainSocket = new Socket(AddressFamily.InterNetwork, SocketType.Raw, ProtocolType.IP);
+                mainSocket = new Socket((ipAddress.Contains(":") ? AddressFamily.InterNetworkV6 : AddressFamily.InterNetwork), SocketType.Raw, ProtocolType.IP);
+
+                // Bind the socket to the selected IP address
+                mainSocket.Bind(new IPEndPoint(IPAddress.Parse(ipAddress), 0));
             }
             catch
             {
-                mainSocket = new Socket(AddressFamily.InterNetwork, SocketType.Raw, ProtocolType.Udp);
-                secondarySocket = new Socket(AddressFamily.InterNetwork, SocketType.Raw, ProtocolType.Tcp);
+                mainSocket = new Socket((ipAddress.Contains(":") ? AddressFamily.InterNetworkV6 : AddressFamily.InterNetwork), SocketType.Raw, ProtocolType.Udp);
+                secondarySocket = new Socket((ipAddress.Contains(":") ? AddressFamily.InterNetworkV6 : AddressFamily.InterNetwork), SocketType.Raw, ProtocolType.Tcp);
+
+                // Bind the socket to the selected IP address
+                mainSocket.Bind(new IPEndPoint(IPAddress.Parse(ipAddress), 0));
             }
 
-            // Bind the socket to the selected IP address
-            mainSocket.Bind(new IPEndPoint(IPAddress.Parse(ipAddress), 0));
-
             // Set the socket options
-            mainSocket.SetSocketOption(SocketOptionLevel.IP,  //Applies only to IP packets
+            mainSocket.SetSocketOption((ipAddress.Contains(":") ? SocketOptionLevel.IPv6: SocketOptionLevel.IP),  //Applies only to IP packets
                                        SocketOptionName.HeaderIncluded, //Set the include header
                                        true);                           //option to true
 
@@ -57,7 +60,7 @@ namespace EpicsSniffer
                 secondarySocket.Bind(new IPEndPoint(IPAddress.Parse(ipAddress), 0));
 
                 // Set the socket options
-                secondarySocket.SetSocketOption(SocketOptionLevel.IP,  //Applies only to IP packets
+                secondarySocket.SetSocketOption((ipAddress.Contains(":") ? SocketOptionLevel.IPv6 : SocketOptionLevel.IP),  //Applies only to IP packets
                                            SocketOptionName.HeaderIncluded, //Set the include header
                                            true);                           //option to true
 
@@ -80,7 +83,7 @@ namespace EpicsSniffer
         {
             mainSocket.Close();
             mainSocket = null;
-            if(secondarySocket != null)
+            if (secondarySocket != null)
                 secondarySocket.Close();
             secondarySocket = null;
         }
@@ -92,6 +95,10 @@ namespace EpicsSniffer
             try
             {
                 size = mainSocket.EndReceive(ar);
+            }
+            catch(NullReferenceException)
+            {
+                return;
             }
             catch (ObjectDisposedException)
             {
