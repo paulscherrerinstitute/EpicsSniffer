@@ -97,6 +97,7 @@ namespace EpicsSniffer
                     || (p.PortSource == 0 && p.PortDestination == 0)
                     || p.Data == null
                     || p.Data.Length == 0)).ToList();
+                    //DataPackets = pCap.ToList();
 
                     // Clear statistics
                     searchStats.Clear();
@@ -132,7 +133,7 @@ namespace EpicsSniffer
                 PacketSource = p.Source,
                 PacketDestination = p.Destination,
                 PacketProtocol = p.PacketType.ToString(),
-                PacketLength = p.Data.Length,
+                PacketLength = p.Data?.Length ?? 0,
                 Packet = p,
                 Foreground = Colorize(p.Data)
             }));
@@ -147,7 +148,7 @@ namespace EpicsSniffer
 
         private IBrush Colorize(byte[] data)
         {
-            if (data.Length < 3)
+            if (data == null || data.Length < 3)
                 return Brushes.Black;
             if (data[0] != 0xCA)
                 return Brushes.Black;

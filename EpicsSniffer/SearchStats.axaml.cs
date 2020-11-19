@@ -38,7 +38,7 @@ namespace EpicsSniffer
 
         public static bool IsSearchPacket(PCapPacket packet)
         {
-            return packet.Data.Length > 3 && packet.Data[0] == 0xCA && packet.Data[3] == 0x3;
+            return packet.Data != null && packet.Data.Length > 3 && packet.Data[0] == 0xCA && packet.Data[3] == 0x3;
         }
 
         public void Add(PCapPacket packet)

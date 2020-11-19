@@ -21,6 +21,7 @@ namespace EpicsSniffer
 
     enum PvCommand : int
     {
+        MalFormatedMessage = -1,
         Beacon = 0x0,
         ConnectionValidation = 0x1,
         Echo = 0x2,
@@ -43,7 +44,7 @@ namespace EpicsSniffer
         MultipleData = 0x13,
         RPC = 0x14,
         CancelRequest = 0x15,
-        OriginTag = 0x16
+        OriginTag = 0x16,
     }
 
     class PvPacket
@@ -53,7 +54,7 @@ namespace EpicsSniffer
         bool IsBigEndian => ((Data[2] & (1 << 7)) != 0);
         bool IsFromServer => ((Data[2] & (1 << 6)) != 0);
 
-        public PvCommand Command => (PvCommand)Data[3];
+        public PvCommand Command => Data.Length > 3 ? (PvCommand)Data[3] : PvCommand.MalFormatedMessage;
 
         public uint ReadUInt32(int offset)
         {
@@ -77,6 +78,8 @@ namespace EpicsSniffer
         {
             get
             {
+                if (Data.Length < 3)
+                    return 0;
                 var result =
                     ((Data[2] & 1) == 0 ? PvPacketFlags.ApplicationMessage : PvPacketFlags.ControlMessage) |
                     ((Data[2] & (1 << 6)) == 0 ? PvPacketFlags.FromClient : PvPacketFlags.FromServer) |
@@ -122,12 +125,25 @@ namespace EpicsSniffer
 
         public static IEnumerable<PvPacket> Split(byte[] data)
         {
+            if (data == null || data.Length < 12)
+            {
+                yield return new PvPacket { Data = data };
+                yield break;
+            }
             var bigEndian = ((data[2] & (1 << 7)) != 0);
             uint offset = 0;
             while (offset < data.Length)
             {
                 var len = ReadUInt32(data, bigEndian, (int)(offset + 4)) + 8; // 8 header + payload Size
                 var subData = new byte[len];
+                if (offset >= data.Length)
+                    yield break;
+                else if (data.Length < len + offset)
+                {
+                    Array.Copy(data, offset, subData, 0, data.Length - offset);
+                    yield return new PvPacket { Data = subData };
+                    yield break;
+                }
                 Array.Copy(data, offset, subData, 0, len);
                 offset += len;
                 yield return new PvPacket { Data = subData };

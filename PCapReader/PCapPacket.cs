@@ -20,8 +20,8 @@ namespace PCapReader
         public ushort PortDestination { get; set; }
 
 
-        public string Source => new IPAddress(IpSource).ToString() + "@" + PortSource;
-        public string Destination => new IPAddress(IpDestination).ToString() + "@" + PortDestination;
+        public string Source => IpSource != null ? new IPAddress(IpSource).ToString() + "@" + PortSource : "null";
+        public string Destination => IpDestination != null ? new IPAddress(IpDestination).ToString() + "@" + PortDestination : "null";
 
         public PCapPacketType PacketType { get; set; }
         public bool IsBaseIpProtocol =>
